@@ -7,6 +7,7 @@ const CallService = require('./callService');
 const QueueService = require('./queueService');
 const { exec } = require('child_process');
 const callService = require('./callService');
+const RecordingService = require('./recordingService')
 
 class AmiApiService {
     constructor() {
@@ -54,6 +55,10 @@ class AmiApiService {
                 });
                 console.log('Client connected ', socket.id);
                 socket.emit('hello', socket.id)
+                socket.on('downloadFile', (files) => {
+                    RecordingService.downloadRecordings(files, socket);
+                    console.log(files)
+                })
 
                 socket.on('getInitData', (evt => {
                     this.io.emit('PeerStatus', { peers: this.sippeers });

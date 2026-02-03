@@ -123,7 +123,26 @@ app.get('/health', async (req, res) => {
         });
     }
 });
+//get cdr data
+const mysql = require('mysql2/promise');
+const dbConfig = {
+    host: process.env.AMI_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWD,
+    database: process.env.AMI_DB,
+};
+app.get('/api/cdr', async (req, res) => {
 
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows] = await connection.execute('SELECT * FROM cdr ORDER BY calldate DESC LIMIT 2000');
+        res.status(201).json(rows);
+        // createMerchant(rows);
+        connection.end();
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+})
 // Update the metrics endpoint
 app.get('/metrics', async (req, res) => {
     try {
